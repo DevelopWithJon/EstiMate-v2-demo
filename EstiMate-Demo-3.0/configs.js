@@ -1,0 +1,1 @@
+export const siteArray = ['realtor.com', 'zillow.com']

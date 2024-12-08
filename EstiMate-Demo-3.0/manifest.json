@@ -1,0 +1,40 @@
+{
+  "manifest_version": 3,
+  "name": "EstiMate Beta!",
+  "version": "1.1",
+  "permissions": [
+    "tabs",
+    "activeTab",
+    "storage"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "host_permissions": [
+    "https://*.realtor.com/*",
+    "https://*.zillow.com/*",
+    "https://*.api.stlouisfed.org/*",
+    "http://localhost:3000/*",
+    "https://esti-matecalculator.com/*"
+],
+  "content_scripts": [
+    {
+      "matches": ["https://www.zillow.com/*", "https://www.realtor.com/*"],
+      "js": [
+        "jquery.js",
+        "functionsZillow.js",
+        "functionsRealtor.js",
+        "functionsForm.js",
+        "calculator.js",
+        "calculatorBRRRR.js",
+        "content.js",
+        "content-brrr.js",
+        "fetchAPI.js"
+
+      ]
+    }
+  ]
+}

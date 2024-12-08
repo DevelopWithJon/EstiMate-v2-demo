@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="popup.css" rel="stylesheet" type="text/css" />
+    <script type="module" src="popup.js"></script>
+    <script type="module" src="background.js"></script>
+    <script type="module" src="updateRealtorPopup.js"></script>
+    <script type="module" src="updateRealtorPopup-brrrr.js"></script>
+    <script type="module" src="updateZillowPopup.js"></script>
+    <script type="module" src="fetchAPI.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+
+    <style>
+      /* Updated styles for the login/signup page */
+      .auth-page {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: flex-start;
+        height: 100vh;
+        background-color: #f0f8ff;
+        padding: 20px;
+        box-sizing: border-box;
+      }
+      .auth-page .header {
+        margin-top: 20px;
+      }
+      .auth-page h1 {
+        margin-bottom: 15px;
+        font-size: 20px;
+        color: #2c3e50;
+        text-align: left;
+      }
+      .auth-page .info-text {
+        font-size: 14px;
+        color: #34495e;
+        max-width: 600px;
+        line-height: 1.4;
+        margin-bottom: 15px;
+        text-align: left;
+      }
+      .auth-page .auth-buttons {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 20px;
+        align-self: center;
+      }
+      .auth-page .auth-buttons button {
+        padding: 8px 16px;
+        font-size: 14px;
+        cursor: pointer;
+        border: none;
+        border-radius: 4px;
+        transition: background-color 0.3s ease;
+      }
+      .auth-page .auth-buttons .login-button {
+        background-color: #3498db;
+        color: white;
+      }
+      .auth-page .auth-buttons .signup-button {
+        background-color: #2ecc71;
+        color: white;
+      }
+      .auth-page .auth-buttons button:hover {
+        opacity: 0.9;
+      }
+      /* Hide the main page initially */
+      #main-content {
+        display: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="auth-page" id="auth-page">
+      <div class="header">
+        <h1>Welcome to EstiMate</h1>
+        <p class="info-text">
+          EstiMate: The fastest tool for analyzing investment properties.
+        </p>
+      </div>
+      <p class="info-text">
+        With EstiMate, you can:
+        <br />&bull; Calculate key investment metrics <br />&bull; Analyze
+        property financials <br />&bull; Make data-driven decisions <br />&bull;
+        Boost your ROI
+      </p>
+      <div class="auth-buttons">
+        <button class="login-button" id="loginPageBtn">Log In</button>
+        <button class="signup-button" id="signupPageBtn">Sign Up</button>
+      </div>
+    </div>
+
+    <div class="overlay" id="overlay">
+      <div id="text-bubble">This is not an active property listing</div>
+    </div>
+
+    <div id="loginModal" class="modal">
+      <div class="modal-content">
+        <span class="close" id="closeModal">&times;</span>
+        <form>
+          <input
+            type="text"
+            class="auth-input-field"
+            id="username"
+            placeholder="Username"
+          />
+          <input
+            type="password"
+            class="auth-input-field"
+            id="password"
+            placeholder="Password"
+          />
+          <button type="button" class="auth-button" id="auth-submit-btn">
+            Submit
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <button class="togglebtn">Toggle Form</button>
+
+    <div id="main-content" style="display: block">
+      <button class="signout-button" id="signoutBtn">Sign Out</button>
+
+      <!-- Loan Details Section -->
+      <button class="collapsible" id="loan-section">Loan Details</button>
+      <div class="content" id="load-content">
+        <div class="inputContainer">
+          <label for="listing-price-rental">Listing Price*</label>
+          <input
+            type="text"
+            id="listing-price-rental"
+            placeholder="Enter Listing Price"
+          />
+        </div>
+        <div class="inputContainer">
+          <label for="reserves-rental">Reserves</label>
+          <input
+            type="text"
+            id="reserves-rental"
+            placeholder="Enter Reserves Amount"
+          />
+        </div>
+        <div class="inputContainer">
+          <label for="disposition-year-rental">Disposition Year*</label>
+          <input
+            type="text"
+            id="disposition-year-rental"
+            placeholder="Enter Disposition Year"
+          />
+        </div>
+        <div class="inputContainer">
+          <label for="loan-to-value-rental">Loan-to-Value (%)*</label>
+          <input
+            type="text"
+            id="loan-to-value-rental"
+            placeholder="Enter Loan-to-Value (%)"
+          />
+        </div>
+        <div class="inputContainer">
+          <label for="interest-rate-rental">Interest Rate (%)*</label>
+          <input
+            type="text"
+            id="interest-rate-rental"
+            placeholder="Enter Loan Rate (%)"
+          />
+        </div>
+        <div class="inputContainer">
+          <label for="closing-costs-rental">Closing Costs (%)*</label>
+          <input
+            type="text"
+            id="closing-costs-rental"
+            placeholder="Enter Closing Costs (%)"
+          />
+        </div>
+        <div class="inputContainer">
+          <label for="selling-costs-rental">Selling Costs (%)*</label>
+          <input
+            type="text"
+            id="selling-costs-rental"
+            placeholder="Enter Selling Costs (%)"
+          />
+        </div>
+        <div class="inputContainer">
+          <label for="exit-cap-rental">Exit Cap (%)*</label>
+          <input
+            type="text"
+            id="exit-cap-rental"
+            placeholder="Enter Exit Cap (%)"
+          />
+        </div>
+      </div>
+
+      <!-- Income Details Section -->
+      <button class="collapsible">Income Details</button>
+      <div class="content">
+        <div class="inputContainer">
+          <label for="revenue-growth-rental">Revenue Growth (%)*</label>
+          <input
+            type="text"
+            id="revenue-growth-rental"
+            placeholder="Enter Revenue Growth (%)"
+          />
+        </div>
+        <div class="inputContainer">
+          <label for="rental-income-rental">Rent Income ($ Mthl)*</label>
+          <input
+            type="text"
+            id="rental-income-rental"
+            placeholder="Enter Rent Income Fee (Monthly)"
+          />
+        </div>
+        <div class="inputContainer">
+          <label for="units-rental">Units</label>
+          <input
+            type="text"
+            id="units-rental"
+            placeholder="Enter Number of Units"
+          />
+        </div>
+      </div>
+
+      <!-- Expense Details Section -->
+      <button class="collapsible">Expense Details</button>
+      <div class="content">
+        <div class="inputContainer">
+          <label for="expense-growth-rental">Expense Growth Rate (%)</label>
+          <input
+            type="text"
+            id="expense-growth-rental"
+            placeholder="Enter Expense Growth Rate (%)"
+          />
+        </div>
+        <div class="inputContainer">
+          <label for="vacancy-rental">Vacancy (%)*</label>
+          <input
+            type="text"
+            id="vacancy-rental"
+            placeholder="Enter Vacancy (%)"
+          />
+        </div>
+        <div class="inputContainer">
+          <label for="management-fee-rental">Management ($)</label>
+          <input
+            type="text"
+            id="management-fee-rental"
+            placeholder="Enter Management Fee (Monthly)"
+          />
+        </div>
+        <div class="inputContainer">
+          <label for="repair-maintenance-rental"
+            >Repairs & Maintenance ($)</label
+          >
+          <input
+            type="text"
+            id="repair-maintenance-rental"
+            placeholder="Enter Repairs & Maintenance Fee (Monthly)"
+          />
+        </div>
+        <div class="inputContainer">
+          <label for="insurance-rental">Insurance ($)</label>
+          <input
+            type="text"
+            id="insurance-rental"
+            placeholder="Enter Insurance Fee (Monthly)"
+          />
+        </div>
+        <div class="inputContainer">
+          <label for="property-tax-rental">Property Tax ($)</label>
+          <input
+            type="text"
+            id="property-tax-rental"
+            placeholder="Enter Property Tax Fee (Monthly)"
+          />
+        </div>
+        <div class="inputContainer">
+          <label for="water-rental">Water ($)</label>
+          <input
+            type="text"
+            id="water-rental"
+            placeholder="Enter Water Fee (Monthly)"
+          />
+        </div>
+        <div class="inputContainer">
+          <label for="gas-rental">Gas ($)</label>
+          <input
+            type="text"
+            id="gas-rental"
+            placeholder="Enter Gas Fee (Monthly)"
+          />
+        </div>
+        <div class="inputContainer">
+          <label for="electricity-rental">Electricity ($)</label>
+          <input
+            type="text"
+            id="electricity-rental"
+            placeholder="Enter Electricity Fee (Monthly)"
+          />
+        </div>
+        <div class="inputContainer">
+          <label for="capital-expenditure-rental">Cap Ex ($)</label>
+          <input
+            type="text"
+            id="capital-expenditure-rental"
+            placeholder="Enter Cap Ex Fee (Monthly)"
+          />
+        </div>
+        <div class="inputContainer">
+          <label for="utilities-rental">Utilities ($)</label>
+          <input
+            type="text"
+            id="utilities-rental"
+            placeholder="Enter Utilities Fee (Monthly)"
+          />
+        </div>
+        <div class="inputContainer">
+          <label for="HOA-rental">HOA ($)</label>
+          <input
+            type="text"
+            id="HOA-rental"
+            placeholder="Enter Home Owner Association Fee (Monthly)"
+          />
+        </div>
+      </div>
+
+      <!-- Analysis Section -->
+      <button class="collapsible" id="analysis-sections">Analysis</button>
+      <div class="content" id="analysis-content">
+        <div class="wrapper">
+          <div class="analysis-item" id="cap-rate-rental">
+            <span class="analysis-item-header">Cap Rate</span>
+            <span class="analysis-item-value" id="cap-rate-value-rental"
+              >0.00%</span
+            >
+          </div>
+          <div class="analysis-item" id="levered-profit-rental">
+            <span class="analysis-item-header">Levered Profit</span>
+            <span class="analysis-item-value" id="levered-profit-value-rental"
+              >$0</span
+            >
+          </div>
+          <div class="analysis-item" id="levered-multiplier-rental">
+            <span class="analysis-item-header">Levered Multiplier</span>
+            <span
+              class="analysis-item-value"
+              id="levered-multiplier-value-rental"
+              >0x</span
+            >
+          </div>
+          <div class="analysis-item" id="cash-on-cash-rental">
+            <span class="analysis-item-header">Cash on Cash Return</span>
+            <span class="analysis-item-value" id="cash-on-cash-value-rental"
+              >0%</span
+            >
+          </div>
+          <div class="analysis-item" id="total-expenses-rental">
+            <span class="analysis-item-header">Total Expense:</span>
+            <span class="analysis-item-value" id="total-expenses-value-rental"
+              >$0</span
+            >
+          </div>
+          <div class="analysis-item" id="NOI-rental">
+            <span class="analysis-item-header">NOI</span>
+            <span class="analysis-item-value" id="NOI-value-rental">$0</span>
+          </div>
+        </div>
+        <div class="analysis-button">
+          <button id="reset-btn-rental" name="reset-btn-rental" class="reset-btn">Reset</button>
+          <button id="post-btn-rental" name="post-btn-rental" class="post-btn">Save</button>
+          <div id="customAlert">This is a custom alert!</div>
+        </div>
+      </div>
+
+      <button id="calculate" class="calculate-btn">Calculate</button>
+    </div>
+    <!-- Closing main-content div -->
+
+    <div class="brrrr-content" id="brrrr-content" style="display: none">
+      <button class="collapsible" id="loan-section">Loan Details</button>
+      <div class="content" id="loan-content">
+        <!-- Changed ID -->
+        <div class="inputContainer">
+          <label for="listing-price-brrrr">Listing Price*</label>
+          <input
+            type="text"
+            id="listing-price-brrrr"
+            placeholder="Enter Listing Price"
+          />
+        </div>
+        <div class="inputContainer">
+          <label for="rehab-costs-brrrr">Rehab Costs*</label>
+          <input
+            type="text"
+            id="rehab-costs-brrrr"
+            placeholder="Enter Rehab Costs Amount"
+          />
+        </div>
+        <div class="inputContainer">
+          <label for="hard-money-loan-to-cost-brrrr"
+            >Hard Money Loan-to-Cost (%)*</label
+          >
+          <input
+            type="text"
+            id="hard-money-loan-to-cost-brrrr"
+            placeholder="Enter Hard Money Loan-to-Cost (%)"
+          />
+        </div><div class="inputContainer">
+          <label for="hard-money-loan-to-value-brrrr"
+            >Hard Money Loan-to-Value (%)*</label
+          >
+          <input
+            type="text"
+            id="hard-money-loan-to-value-brrrr"
+            placeholder="Enter Hard Money Loan-to-Value (%)"
+          />
+        </div>
+        <div class="inputContainer">
+          <label for="hard-money-interest-rate-brrrr"
+            >Hard Money Interest Rate (%)*</label
+          >
+          <input
+            type="text"
+            id="hard-money-interest-rate-brrrr"
+            placeholder="Enter Hard Money Interest Rate (%)"
+          />
+        </div>
+        <div class="inputContainer">
+          <label for="refinance-interest-rate-brrrr"
+            >Refinance Interest Rate (%)*</label
+          >
+          <input
+            type="text"
+            id="refinance-interest-rate-brrrr"
+            placeholder="Enter Refinance Interest Rate (%)"
+          />
+        </div>
+        <div class="inputContainer">
+          <label for="months-until-refinance-brrrr"
+            >Months Until Refinance*</label
+          >
+          <input
+            type="text"
+            id="months-until-refinance-brrrr"
+            placeholder="Enter Months Until Refinance"
+          />
+        </div>
+        <div class="inputContainer">
+          <label for="down-payment-brrrr">Down Payment (%)*</label>
+          <input
+            type="text"
+            id="down-payment-brrrr"
+            placeholder="Enter Down Payment"
+          />
+        </div>
+        <div class="inputContainer">
+          <label for="closing-costs-brrrr">Closing Costs (%)*</label>
+          <input
+            type="text"
+            id="closing-costs-brrrr"
+            placeholder="Enter Closing Costs (%)"
+          />
+        </div>
+      </div>
+
+      <button class="collapsible">Expense Details</button>
+      <div class="content">
+        <div class="inputContainer">
+          <label for="vacancy-brrrr">Vacancy (%)*</label>
+          <input
+            type="text"
+            id="vacancy-brrrr"
+            placeholder="Enter Vacancy (%)"
+          />
+        </div>
+        <div class="inputContainer">
+          <label for="management-fee-brrrr">Management ($)</label>
+          <input
+            type="text"
+            id="management-fee-brrrr"
+            placeholder="Enter Management Fee (Monthly)"
+          />
+        </div>
+        <div class="inputContainer">
+          <label for="repair-maintenance-brrrr"
+            >Repairs & Maintenance ($)</label
+          >
+          <input
+            type="text"
+            id="repair-maintenance-brrrr"
+            placeholder="Enter Repairs & Maintenance Fee (Monthly)"
+          />
+        </div>
+        <div class="inputContainer">
+          <label for="insurance-brrrr">Insurance ($)</label>
+          <input
+            type="text"
+            id="insurance-brrrr"
+            placeholder="Enter Insurance Fee (Monthly)"
+          />
+        </div>
+        <div class="inputContainer">
+          <label for="property-tax-brrrr">Property Tax ($)</label>
+          <input
+            type="text"
+            id="property-tax-brrrr"
+            placeholder="Enter Property Tax Fee (Monthly)"
+          />
+        </div>
+        <div class="inputContainer">
+          <label for="water-brrrr">Water ($)</label>
+          <input
+            type="text"
+            id="water-brrrr"
+            placeholder="Enter Water Fee (Monthly)"
+          />
+        </div>
+        <div class="inputContainer">
+          <label for="gas-brrrr">Gas ($)</label>
+          <input
+            type="text"
+            id="gas-brrrr"
+            placeholder="Enter Gas Fee (Monthly)"
+          />
+        </div>
+        <div class="inputContainer">
+          <label for="electricity-brrrr">Electricity ($)</label>
+          <input
+            type="text"
+            id="electricity-brrrr"
+            placeholder="Enter Electricity Fee (Monthly)"
+          />
+        </div>
+        <div class="inputContainer">
+          <label for="capital-ex-brrrr">Cap Ex ($)</label>
+          <input
+            type="text"
+            id="capital-ex-brrrr"
+            placeholder="Enter Cap Ex Fee (Monthly)"
+          />
+        </div>
+        <div class="inputContainer">
+          <label for="utilities-brrrr">Utilities ($)</label>
+          <input
+            type="text"
+            id="utilities-brrrr"
+            placeholder="Enter Utilities Fee (Monthly)"
+          />
+        </div>
+        <div class="inputContainer">
+          <label for="HOA-brrrr">HOA ($)</label>
+          <input
+            type="text"
+            id="HOA-brrrr"
+            placeholder="Enter Home Owner Association Fee (Monthly)"
+          />
+        </div>
+      </div>
+
+      <button class="collapsible" id="value-section">Value</button>
+      <div class="content">
+        <div class="inputContainer">
+          <label for="units-brrrr">Units</label>
+          <input
+            type="text"
+            id="units-brrrr"
+            placeholder="Enter Number of Units"
+          />
+        </div>
+        <div class="inputContainer">
+          <label for="after-repair-value-brrrr">After Repair Value*</label>
+          <input
+            type="text"
+            id="after-repair-value-brrrr"
+            placeholder="Enter After Repair Value"
+          />
+        </div>
+        <div class="inputContainer">
+          <label for="rent-income-brrrr">Rent Income ($ Mthl)</label>
+          <input
+            type="text"
+            id="rent-income-brrrr"
+            placeholder="Enter Rent Income Fee (Monthly)"
+          />
+        </div>
+      </div>
+
+      <button class="collapsible" id="analysis-section">Analysis</button>
+      <div class="content" id="analysis-content">
+        <!-- Changed ID -->
+        <div class="inputContainer">
+          <div class="wrapper">
+            <div class="analysis-item" id="cap-rate-brrrr">
+              <span class="analysis-item-header">Cap Rate</span>
+              <span class="analysis-item-value" id="cap-rate-value-brrrr"
+                >0.00%</span
+              >
+            </div>
+            <div class="analysis-item" id="cap-rate-after-repairs-brrrr">
+              <span class="analysis-item-header">Cap Rate After Repairs</span>
+              <span
+                class="analysis-item-value"
+                id="cap-rate-after-repairs-value-brrrr"
+                >0.00%</span
+              >
+            </div>
+            <div class="analysis-item" id="total-equity-brrrr">
+              <span class="analysis-item-header">Total Equity</span>
+              <span
+                class="analysis-item-value"
+                id="total-equity-value-brrrr"
+                >$0</span
+              >
+            </div>
+            <div class="analysis-item" id="total-expenses-brrrr">
+              <span class="analysis-item-header">Total Expense</span>
+              <span class="analysis-item-value" id="total-expenses-value-brrrr"
+                >$0</span
+              >
+            </div>
+            <div class="analysis-item" id="NOI-brrrr">
+              <span class="analysis-item-header">NOI</span>
+              <span class="analysis-item-value" id="NOI-value-brrrr">$0</span>
+            </div>
+            <div class="analysis-item" id="cash-on-cash-brrrr">
+              <span class="analysis-item-header">Cash on Cash Return</span>
+              <span class="analysis-item-value" id="cash-on-cash-value-brrrr"
+                >0%</span
+              >
+            </div>
+          </div>
+        </div>
+        <div class="analysis-button">
+          <button id="reset-btn-brrrr" name="reset-btn-brrrr" class="reset-btn">Reset</button>
+          <button id="post-btn-brrrr" name="post-btn-brrrr" class="post-btn">Post</button>
+          <div id="customAlert">This is a custom alert!</div>
+        </div>
+      </div>
+
+      <button id="calculate-brrrr" class="calculate-btn">Calculate</button>
+    </div>
+  </body>
+</html>
